@@ -5,7 +5,7 @@ import "testing"
 func TestCliCommands(t *testing.T) {
 	commands := getCommands()
 
-	expectedCommands := []cliCommands{
+	expectedCommands := []cliCommand{
 		{
 			name:        "help",
 			description: "Displays a help message",
