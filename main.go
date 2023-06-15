@@ -1,69 +1,64 @@
 package main
 
 import (
-	"bufio"
+	"errors"
 	"fmt"
 	"log"
 	"os"
 	"strings"
+	"time"
+
+	"github.com/StelIify/pokedex/internal/data"
+	"github.com/chzyer/readline"
 )
 
-type Config struct {
-	next     string
-	previous string
-}
-
-// type CommandConfig struct {
-// 	configs map[string]*Config
-// }
-
-// func NewCommandConfig() *CommandConfig {
-// 	return &CommandConfig{
-// 		configs: map[string]*Config{
-// 			"map": generateLocationConfig(),
-// 			"pokemon": generatePokemonConfig(),
-// 		},
-
-// 	}
-// }
-
-func NewConfig(next, previous string) *Config {
-	return &Config{
-		next:     next,
-		previous: previous,
-	}
-}
-
-const cliName = "pokedex"
-
-func printPrompt() {
-	fmt.Print(cliName, "> ")
-}
-
-func cleanInput(text string) string {
+func cleanInput(text string) []string {
 	cleanTxt := strings.TrimSpace(text)
 	cleanTxt = strings.ToLower(cleanTxt)
-	return cleanTxt
+	words := strings.Fields(cleanTxt)
+	return words
 }
+
 func main() {
 	erorrLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 
-	reader := bufio.NewScanner(os.Stdin)
-	printPrompt()
+	cache := data.NewCache(time.Minute)
+	httpClient := data.NewClient(time.Minute, cache)
+
+	cfg := &Config{
+		client: httpClient,
+	}
+	rl, err := readline.New("pokedex> ")
+	if err != nil {
+		log.Fatal(fmt.Errorf("failed to create readline instance: %v", err))
+	}
+	defer rl.Close()
+
 	commands := getCommandsMap(getCommands())
-	for reader.Scan() {
-		text := reader.Text()
+	for {
+		text, err := rl.Readline()
+		if err != nil {
+			if errors.Is(readline.ErrInterrupt, err) {
+				os.Exit(0)
+			} else {
+				fmt.Println("Failed to read input: ", err)
+				continue
+			}
+		}
 		cleanText := cleanInput(text)
-		command, ok := commands[cleanText]
+		command, ok := commands[cleanText[0]]
 		if !ok {
 			fmt.Println("Invalid command, type 'help' to see available commands")
 			continue
 		}
-		err := command.callback(command.config)
+		args := []string{}
+		if len(cleanText) > 1 {
+			args = cleanText[1:]
+		}
+		err = command.callback(cfg, args...)
 		if err != nil {
 			fmt.Println(err)
 			erorrLog.Println(err)
 		}
-		printPrompt()
 	}
 }
