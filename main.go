@@ -20,13 +20,14 @@ func cleanInput(text string) []string {
 }
 
 func main() {
-	erorrLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+	// erorrLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 
 	cache := data.NewCache(time.Minute)
 	httpClient := data.NewClient(time.Minute, cache)
 
 	cfg := &Config{
-		client: httpClient,
+		client:  httpClient,
+		pokedex: make(map[string]*data.PokemonResp),
 	}
 	rl, err := readline.New("pokedex> ")
 	if err != nil {
@@ -58,7 +59,7 @@ func main() {
 		err = command.callback(cfg, args...)
 		if err != nil {
 			fmt.Println(err)
-			erorrLog.Println(err)
+			// erorrLog.Println(err)
 		}
 	}
 }
