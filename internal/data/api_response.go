@@ -59,7 +59,7 @@ func NewClient(timeout time.Duration, cache *Cache) Client {
 		cache:  cache,
 	}
 }
-
+//@TODO refactor http request to seprate function
 func (c *Client) GetLocationAreas(next *string) (*LocationAreasResp, error) {
 	endpoint := "/location-area"
 	fullPath := baseUrl + endpoint

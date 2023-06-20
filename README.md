@@ -1,9 +1,22 @@
 Cli application written in go to interact with pokeapi (https://pokeapi.co/)
 
-functionality:
+Simple application to explore the areas, find and catch pokemons
 
-- explore locations to find and catch a pokemon
-- help command to list all available commands
-- caching
-# todo 
+- "help" - Displays a help message,
+- "exit" - Exit the Pokedex,
+- "map" - Dispays the name of 20 location areas,
+- "mapb" - Dispays the name of 20 previous location areas,
+- "explore" - Explore particular area and display found pokemons,
+- "catch" - Try to catch pokemon found in particular location,
+- "inspect" - Inspect pokemon in your pokedex, show it's stats,
+- "pokedex" - Display all the pokemons you were able to catch,
+
+## Start the application
+
+- `go run . or go build && ./pokedex`
+
+
+# Todo 
 - autocomplete for easier exploration 
+- write tests
+- refactor
